@@ -1,18 +1,23 @@
 require 'dll'
-require 'viewmat'
-libteem=: IFUNIX{::'libteem.dll';('Darwin'-:UNAME){::'libteem.so';'libteem.dylib'
+
+coclass 'nrrd'
+
+libteem=. IFUNIX{::'libteem.dll';('Darwin'-:UNAME){::'libteem.so';'libteem.dylib'
 SZI=: IF64{4 8
 
-error=:13!:8
-unknown=: 'Nrrd type is unkown'&error@:1:
-int1=: 'Signed 1 byte integer not implemented yet'&error@:1:
-uint1=: 'Unsigned 1 byte integer not implemented yet'&error@:1:
+NB. adverb to make a verb that throws error 11 (nonce) with error message
+notImp=: 1 : '(13!:8)@:(11"_)@:smoutput@:(m"_)'
+
+NB. Binary to J conversion verbs 
+unknown=. 'Nrrd type is unkown' notImp
+int1=: 'Signed 1 byte integer not implemented yet' notImp
+uint1=: 'Unsigned 1 byte integer not implemented yet' notImp
 int2=: _1 & ic  
 uint2=: 0 & ic  
 int4=: _2 & ic  
-uint4=: 'Unsigned 4 byte integer not implemented yet'&error@:1:
+uint4=: 'Unsigned 4 byte integer not implemented yet' notImp
 int8=: _3 & ic  
-uint8=: 'Unsigned 8 byte integer not implemented yet'&error@:1:
+uint8=: 'Unsigned 8 byte integer not implemented yet' notImp
 float4=: _1 & fc 
 float8=: _2 & fc
 
@@ -48,6 +53,7 @@ NB.     ...
 NB. } Nrrd;
 readnrrd=: 3 : 0
     filename=.y
+    (filename, ' does not exist.') assert fexist filename
     nrrd_ptr=. nrrdNew cd ''
     nrrdLoad cd nrrd_ptr;filename;0
     data_ptr=. int2j memr nrrd_ptr,0,SZI
@@ -64,5 +70,5 @@ readnrrd=: 3 : 0
     size $ (binary_converters @. type) data
 )
 
-NB. e.g: 98 viewlice nrrd=.readnrrd 'T1.nrrd'
-viewslice=: [: (0 0 0,:255 255 255)&viewmat [ { ]
+readnrrd_z_=: readnrrd_nrrd_
+
